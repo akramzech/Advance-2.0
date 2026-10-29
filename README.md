@@ -54,6 +54,7 @@ Claude akan tanya maklumat yang kurang, dan takkan reka testimoni atau harga.
 | Journey Map Hook | "Journey Map Hook" | Iklan travel yang dibuka dengan peta 3D |
 | Epic Style | "Epic Style" | Iklan travel 9:16, warna bendera ke warna brand |
 | Travel Style | "Travel Style" | Travel lifestyle / pakej percutian, navy + emas |
+| 3Point-Style | "3Point-Style" | Video tips / senarai ("3 kesilapan", "3 tips"), navy + emas, carta data |
 
 ### ✨ Motion Ad (tak perlu footage)
 | Style | Sebut | Sesuai untuk |

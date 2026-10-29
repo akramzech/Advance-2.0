@@ -17,6 +17,7 @@ Talk to the student in Bahasa Melayu (casual, like Coach Am) unless they write i
 | `journey-map-hook` | "Journey Map Hook" | Travel ad that opens on a cinematic 3D terrain map, then real footage behind a cut-out |
 | `epic-style` | "Epic Style" | 9:16 travel ad: flag-colour act then brand act, lift transitions, map trail, 3D itinerary |
 | `travel-style` | "Travel Style" | 9:16 travel lifestyle / holiday package: navy + gold, cleaned phone takes, flight-map trail |
+| `3point-style` | "3Point-Style" | 9:16 tips / listicle ("3 kesilapan"): navy + gold, serif point titles, hero words behind the head, data panel, recap end card |
 
 ### Motion Ad (100 % motion: voice-over, plus at most a few photos)
 | Skill | Say | Look |

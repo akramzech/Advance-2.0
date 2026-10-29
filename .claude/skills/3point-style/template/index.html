@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="ms">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      @font-face { font-family: "Poppins"; font-weight: 600; src: url("assets/fonts/Poppins-600.woff2") format("woff2"); }
+      @font-face { font-family: "Poppins"; font-weight: 700; src: url("assets/fonts/Poppins-700.woff2") format("woff2"); }
+      @font-face { font-family: "Poppins"; font-weight: 800; src: url("assets/fonts/Poppins-800.woff2") format("woff2"); }
+      @font-face { font-family: "Sacramento"; font-weight: 400; src: url("assets/fonts/Sacramento-400.woff2") format("woff2"); }
+      @font-face { font-family: "NSD"; font-weight: 100 900; font-stretch: 62.5% 100%; src: url("assets/fonts/NotoSerifDisplay-800-62_5.woff2") format("woff2"); }
+
+      /* Act 1, the problem (0-47.3 s): gold titles with a navy edge. Act 2, the fix (from "PERKESO EIS"): white with a navy stroke + halo, gold accents. */
+      :root { --royal: #fada5e; --gold: #ffc72c; --gold-hi: #ffe07a; --navy: #0a1a4f; --deep: #071238; --ink: #0d1530; }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1080px; height: 1920px; overflow: hidden; background: #071238; }
+      #root { position: absolute; inset: 0; overflow: hidden; background: #071238; font-family: Poppins, sans-serif; }
+      .abs { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+
+      /* ---------- backgrounds ---------- */
+      #broll { z-index: 10; }
+      #cut { z-index: 35; }
+      .bk { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; overflow: hidden; visibility: hidden; background: #071238; }
+      .bk .kb { position: absolute; left: -54px; top: -96px; width: 1188px; height: 2112px; will-change: transform; }
+      .bk .kb img, .bk .kb video { width: 100%; height: 100%; object-fit: cover; display: block; }
+      .bk .own { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+      .bk .own video { width: 1080px; height: 1920px; display: block; }
+
+      /* ---------- signature: EIS 6-month chart (replaces the route map; same "presenter steps down" beat) ---------- */
+      #chart { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+      #ch-panel { position: absolute; left: 60px; top: 100px; width: 960px; height: 790px; border-radius: 40px;
+        background: linear-gradient(180deg, #0a1a4f 0%, #071238 100%); border: 5px solid #fff; box-shadow: 0 24px 60px rgba(7, 18, 56, .55); }
+      #ch-kick { position: absolute; left: 0; width: 1080px; top: 140px; text-align: center; font: italic 700 42px/1 Poppins, sans-serif; color: #fff; }
+      #ch-title { position: absolute; left: 0; width: 1080px; top: 196px; text-align: center; font-family: NSD, serif; font-weight: 800; font-stretch: 62.5%;
+        font-variation-settings: "wdth" 62.5, "wght" 800; font-size: 150px; line-height: .86; color: #fff; text-transform: uppercase;
+        -webkit-text-stroke: 10px var(--deep); paint-order: stroke fill; text-shadow: 0 8px 0 var(--deep); }
+      #ch-title .g { color: var(--gold); }
+      #ch-title .ln { display: block; }
+      #ch-scr { position: absolute; left: 0; width: 1080px; top: 330px; text-align: center; font: 400 76px/1 Sacramento, cursive; color: var(--gold-hi); transform: rotate(-4deg); white-space: nowrap; }
+      .col { position: absolute; top: 0; width: 112px; height: 1920px; }
+      .col .bar { position: absolute; left: 0; top: 380px; width: 112px; height: 380px; border-radius: 16px 16px 4px 4px;
+        background: linear-gradient(180deg, var(--gold-hi) 0%, var(--gold) 60%); border: 4px solid #fff; transform-origin: 50% 100%; }
+      .col .pct { position: absolute; left: -30px; width: 172px; top: 0; text-align: center; font: 800 50px/1 Poppins, sans-serif; color: #fff;
+        -webkit-text-stroke: 8px var(--deep); paint-order: stroke fill; white-space: nowrap; }
+      .col .mo { position: absolute; left: -20px; width: 152px; top: 776px; text-align: center; font: 700 24px/1.05 Poppins, sans-serif; color: rgba(255,255,255,.8); letter-spacing: .02em; }
+      .col .mo b { display: block; font: 800 44px/1 Poppins, sans-serif; color: #fff; }
+      #ch-base { position: absolute; left: 100px; width: 880px; top: 760px; height: 6px; border-radius: 3px; background: #fff; transform-origin: 0 50%; }
+      #ch-note { position: absolute; left: 90px; width: 900px; top: 852px; text-align: center; font: 600 22px/1.2 Poppins, sans-serif; color: rgba(255,255,255,.78); }
+
+      /* chips: "duit rumah, duit makan, duit kereta" */
+      #chips { position: absolute; left: 0; top: 110px; width: 1080px; z-index: 40; visibility: hidden; text-align: center; }
+      #chips .kick { font: italic 700 44px/1 Poppins, sans-serif; color: #fff; text-shadow: 0 3px 18px rgba(7, 18, 56, 0.75), 0 0 6px rgba(7, 18, 56, .6); margin-bottom: 22px; }
+      #chips .row { display: flex; justify-content: center; gap: 26px; }
+      #chips .chip { display: inline-block; padding: 18px 34px 20px; border-radius: 999px; background: var(--navy); border: 5px solid #fff;
+        font: 800 56px/1 Poppins, sans-serif; color: var(--gold); letter-spacing: -0.01em; box-shadow: 0 10px 0 var(--deep), 0 18px 40px rgba(7, 18, 56, .45); }
+
+      /* ---------- titles ---------- */
+      .hero, .place { position: absolute; left: 0; width: 1080px; text-align: center; pointer-events: none; visibility: hidden; }
+      .hero { z-index: 25; top: 605px; }           /* behind the presenter: the head overlaps the word */
+      .place { z-index: 40; top: 170px; }
+      .hero .w { position: relative; display: inline-block; }
+      .hero .big { display: block; font: 800 250px/0.9 Poppins, sans-serif; letter-spacing: -0.035em; color: #fff;
+        text-shadow: 0 10px 50px rgba(7, 18, 56, 0.5), 0 2px 10px rgba(7, 18, 56, 0.3); white-space: nowrap; }
+      .hero .scr { position: absolute; left: 0px; top: -88px; font: 400 128px/1 Sacramento, cursive; color: var(--gold-hi); transform: rotate(-7deg);
+        transform-origin: 0 100%; text-shadow: 0 4px 26px rgba(7, 18, 56, 0.7); white-space: nowrap; }
+      .place .kick { display: inline-flex; align-items: center; gap: 16px; font: italic 700 44px/1 Poppins, sans-serif; color: #fff; letter-spacing: 0.01em;
+        text-shadow: 0 3px 18px rgba(7, 18, 56, 0.75), 0 0 6px rgba(7, 18, 56, .6); margin-bottom: 14px; }
+      .place .big { font-family: NSD, serif; font-weight: 800; font-stretch: 62.5%; font-variation-settings: "wdth" 62.5, "wght" 800;
+        font-size: 210px; line-height: 0.86; letter-spacing: 0.005em; color: var(--gold); text-transform: uppercase;
+        -webkit-text-stroke: 8px var(--navy); paint-order: stroke fill;
+        text-shadow: 0 7px 0 var(--navy), 0 0 34px rgba(7, 18, 56, 0.55); }
+      .place .big .ln { display: block; }
+      /* brand act */
+      .place.mk .kick { color: #fff; -webkit-text-stroke: 7px var(--navy); paint-order: stroke fill; text-shadow: 0 0 18px rgba(7, 18, 56, 0.95), 0 0 40px rgba(7, 18, 56, 0.6); }
+      .place.mk .big { color: #fff; -webkit-text-stroke: 10px var(--navy); paint-order: stroke fill; text-shadow: 0 8px 0 var(--navy), 0 0 30px rgba(7, 18, 56, 0.9), 0 0 70px rgba(7, 18, 56, 0.55); }
+      .place.mk .big .g { color: var(--gold); }
+      .hero.mk .big { -webkit-text-stroke: 12px var(--navy); paint-order: stroke fill; text-shadow: 0 10px 0 var(--navy), 0 0 34px rgba(7, 18, 56, 0.9), 0 0 80px rgba(7, 18, 56, 0.55); }
+      .hero.mk .scr { color: var(--gold-hi); -webkit-text-stroke: 6px var(--navy); paint-order: stroke fill; text-shadow: 0 0 16px rgba(7, 18, 56, 0.95), 0 0 36px rgba(7, 18, 56, 0.6); }
+
+      /* ---------- presenter (pixel-exact cut-out) ---------- */
+      #pres-wrap { z-index: 30; }
+      #pres-cam { position: absolute; inset: 0; }
+      #pres { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+
+      /* ---------- captions ---------- */
+      #caps { z-index: 50; pointer-events: none; }
+      .cap { position: absolute; left: 60px; width: 960px; top: 1500px; text-align: center; visibility: hidden; font: 800 66px/1.08 Poppins, sans-serif; color: #fff; letter-spacing: -0.01em;
+        -webkit-text-stroke: 9px var(--ink); paint-order: stroke fill; text-shadow: 0 7px 0 rgba(13, 21, 48, 0.9), 0 12px 30px rgba(0, 0, 0, 0.4); }
+      .cap .kw { color: var(--royal); }
+      .cap.mk { -webkit-text-stroke: 10px var(--navy); text-shadow: 0 7px 0 var(--navy), 0 0 22px rgba(7, 18, 56, 0.9), 0 0 48px rgba(7, 18, 56, 0.65); }
+
+      /* ---------- end: recap over the softened last shot (no logo supplied) ---------- */
+      #end { z-index: 60; visibility: hidden; }
+      #end-title { position: absolute; left: 0; width: 1080px; top: 360px; text-align: center; font-family: NSD, serif; font-weight: 800; font-stretch: 62.5%;
+        font-variation-settings: "wdth" 62.5, "wght" 800; font-size: 180px; line-height: .86; color: #fff; text-transform: uppercase; white-space: nowrap;
+        -webkit-text-stroke: 10px var(--navy); paint-order: stroke fill; text-shadow: 0 8px 0 var(--navy), 0 0 30px rgba(7, 18, 56, 0.9), 0 0 70px rgba(7, 18, 56, 0.55); }
+      #end-title .g { color: var(--gold); }
+      #end-sweep { position: absolute; left: 0; width: 1080px; top: 360px; text-align: center; font-family: NSD, serif; font-weight: 800; font-stretch: 62.5%;
+        font-variation-settings: "wdth" 62.5, "wght" 800; font-size: 180px; line-height: .86; text-transform: uppercase; color: transparent; white-space: nowrap;
+        background: linear-gradient(105deg, rgba(255,255,255,0) 40%, rgba(255,248,220,.95) 50%, rgba(255,255,255,0) 60%); background-size: 300% 100%; background-position: 100% 0;
+        -webkit-background-clip: text; background-clip: text; }
+      #end-list { position: absolute; left: 150px; width: 820px; top: 640px; }
+      #end-list .it { display: flex; align-items: center; gap: 28px; margin-bottom: 30px; font: 800 58px/1 Poppins, sans-serif; color: #fff; letter-spacing: -0.01em;
+        -webkit-text-stroke: 9px var(--navy); paint-order: stroke fill; text-shadow: 0 6px 0 var(--navy), 0 0 26px rgba(7, 18, 56, 0.9); }
+      #end-list .n { flex: none; width: 92px; height: 92px; border-radius: 50%; background: var(--navy); border: 5px solid #fff; color: var(--gold);
+        -webkit-text-stroke: 0; text-shadow: none; display: flex; align-items: center; justify-content: center; font-size: 52px; }
+      #end-scr { position: absolute; left: 0; width: 1080px; top: 1050px; text-align: center; white-space: nowrap; font: 400 104px/1 Sacramento, cursive; color: var(--gold-hi); transform: rotate(-4deg);
+        -webkit-text-stroke: 5px var(--navy); paint-order: stroke fill; text-shadow: 0 0 16px rgba(7, 18, 56, 0.95), 0 0 40px rgba(7, 18, 56, 0.7); }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="82" data-width="1080" data-height="1920">
+      <!-- backgrounds, chronological: each later layer covers the earlier one. Own-background slices of aroll_cut.mp4, each with a 1 s freeze tail for its lift. -->
+      <div id="broll" class="abs">
+        <div class="bk" id="bkown1"><div class="own own-cam"><video id="v-own1" class="clip" src="assets/clips/own1.mp4" muted playsinline data-start="0" data-duration="10.633" data-track-index="10"></video></div></div>
+        <div class="bk" id="bkown2"><div class="own own-cam"><video id="v-own2" class="clip" src="assets/clips/own2.mp4" muted playsinline data-start="9.633" data-duration="19.434" data-track-index="11"></video></div></div>
+        <div class="bk" id="bkown3"><div class="own own-cam"><video id="v-own3" class="clip" src="assets/clips/own3.mp4" muted playsinline data-start="28.067" data-duration="15.066" data-track-index="12"></video></div></div>
+        <div class="bk" id="bkown4"><div class="own own-cam"><video id="v-own4" class="clip" src="assets/clips/own4.mp4" muted playsinline data-start="42.133" data-duration="12.034" data-track-index="13"></video></div></div>
+        <div class="bk" id="bkown5"><div class="own own-cam"><video id="v-own5" class="clip" src="assets/clips/own5.mp4" muted playsinline data-start="53.167" data-duration="18.5" data-track-index="14"></video></div></div>
+        <div class="bk" id="bkchart"><div class="kb"><img src="assets/broll/chartbg.jpg" alt="" /></div>
+          <div id="chart">
+            <div id="ch-panel"></div>
+            <div id="ch-kick">Yang ketiga, claim</div>
+            <div id="ch-title"><span class="ln">Perkeso <span class="g">EIS</span></span></div>
+            <div id="ch-scr">dapat hingga 6 bulan</div>
+            <div class="col" id="c1"><i class="bar"></i><b class="pct">80%</b><span class="mo">BULAN<b>1</b></span></div>
+            <div class="col" id="c2"><i class="bar"></i><b class="pct">50%</b><span class="mo">BULAN<b>2</b></span></div>
+            <div class="col" id="c3"><i class="bar"></i><b class="pct">40%</b><span class="mo">BULAN<b>3</b></span></div>
+            <div class="col" id="c4"><i class="bar"></i><b class="pct">40%</b><span class="mo">BULAN<b>4</b></span></div>
+            <div class="col" id="c5"><i class="bar"></i><b class="pct">30%</b><span class="mo">BULAN<b>5</b></span></div>
+            <div class="col" id="c6"><i class="bar"></i><b class="pct">30%</b><span class="mo">BULAN<b>6</b></span></div>
+            <div id="ch-base"></div>
+            <div id="ch-note">*Elaun Mencari Pekerjaan (EIS) PERKESO, tertakluk syarat kelayakan.</div>
+          </div>
+        </div>
+        <div class="bk" id="bkown6"><div class="own own-cam"><video id="v-own6" class="clip" src="assets/clips/own6.mp4" muted playsinline data-start="70.667" data-duration="11.333" data-track-index="15"></video></div></div>
+      </div>
+
+      <!-- hero words: BEHIND the presenter -->
+      <div class="hero" id="h-kes" style="top:495px"><div class="w"><span class="scr" style="left:10px">tiga</span><span class="big" style="font-size:160px">Kesilapan</span></div></div>
+      <div class="hero" id="h-bulan" style="top:240px"><div class="w"><span class="scr" style="left:10px">bahagikan</span><span class="big" style="font-size:165px">3-6 Bulan</span></div></div>
+      <div class="hero" id="h-jimat" style="top:315px"><div class="w"><span class="scr" style="left:10px">kena</span><span class="big" style="font-size:180px">Berjimat</span></div></div>
+      <div class="hero" id="h-moment" style="top:330px"><div class="w"><span class="scr" style="left:10px">jangan hilang</span><span class="big" style="font-size:158px">Momentum</span></div></div>
+      <div class="hero mk" id="h-cukup" style="top:530px"><div class="w"><span class="scr" style="left:6px">atau tidak</span><span class="big" style="font-size:230px">Cukup?</span></div></div>
+
+      <!-- presenter -->
+      <div id="pres-wrap" class="abs">
+        <div id="pres-cam">
+          <video id="pres" class="clip" src="assets/presenter.webm" muted playsinline data-start="0" data-duration="78.8" data-track-index="3"></video>
+        </div>
+      </div>
+
+      <!-- full-frame layers over the presenter: the park cutaway, and the L5 return from the chart -->
+      <div id="cut" class="abs">
+        <div class="bk" id="cwalk"><div class="kb"><video id="v-walk" class="clip" src="assets/clips/walk.mp4" muted playsinline data-start="27.9" data-duration="4.266" data-track-index="20"></video></div></div>
+        <div class="bk" id="cown5"><div class="own"><video id="v-own5c" class="clip" src="assets/clips/own5c.mp4" muted playsinline data-start="53.167" data-duration="17.5" data-track-index="21"></video></div></div>
+      </div>
+
+      <!-- titles: in front -->
+      <div class="place" id="p-kerja" style="top:140px"><div class="kick">Lepas korang</div><div class="big" style="font-size:125px"><span class="ln">Diberhentikan</span><span class="ln">Kerja</span></div></div>
+      <div class="place" id="p-1" style="top:110px"><div class="kick">Yang pertama</div><div class="big" style="font-size:170px"><span class="ln">Jangan</span><span class="ln">Membazir</span></div></div>
+      <div id="chips"><div class="kick">Duit untuk bayar</div><div class="row"><span class="chip" id="chip1">Rumah</span><span class="chip" id="chip2">Makan</span><span class="chip" id="chip3">Kereta</span></div></div>
+      <div class="place" id="p-2" style="top:150px"><div class="kick">Yang kedua</div><div class="big" style="font-size:190px"><span class="ln">Jangan</span><span class="ln">Tunggu Lama</span></div></div>
+      <div class="place mk" id="p-follow" style="top:130px"><div class="kick">Suka konten macam ni?</div><div class="big" style="font-size:150px"><span class="ln">Jom</span><span class="ln"><span class="g">Follow</span> Saya</span></div></div>
+
+      <div id="caps" class="abs"></div>
+
+      <div id="end" class="abs">
+        <div id="end-title"><span class="g">3</span> Kesilapan</div>
+        <div id="end-sweep">3 Kesilapan</div>
+        <div id="end-list">
+          <div class="it" id="it1"><span class="n">1</span>Jangan membazir</div>
+          <div class="it" id="it2"><span class="n">2</span>Jangan tunggu lama</div>
+          <div class="it" id="it3"><span class="n">3</span>Claim PERKESO EIS</div>
+        </div>
+        <div id="end-scr">jom follow saya</div>
+      </div>
+
+      <audio id="mix" src="assets/audio_mix.wav" data-start="0" data-duration="82" data-track-index="0" data-volume="1"></audio>
+    </div>
+
+    <script src="assets/js/captions.js"></script>
+    <script src="assets/js/anim.js"></script>
+    <script>
+      window.__timelines = window.__timelines || {};
+      window.__timelines["main"] = window.AKG_TL;
+    </script>
+  </body>
+</html>
